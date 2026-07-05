@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- 🟢 كود إثبات الملكية الجديد والمطابق لصورة جوجل سيرش كونسل الأخيرة -->
-    <meta name="google-site-verification" content="krxC0x8e-2CABTp" />
+    <meta name="google-site-verification" content="krxC0x8e-2CABTp">
 
-    <!-- 🎯 ضبط الـ SEO عشان يظهر في بحث جوجل بالاسم الجديد بالملي -->
     <title>Ground EEG Paste - منصة تحليل رسم المخ المتكاملة</title>
     <meta name="description" content="موقع Ground EEG Paste هو المنصة الطبية العصرية الأحدث لتخطيط ومتابعة موجات رسم المخ وتحليل البيانات الحيوية بدقة فائقة للأطباء والمستشفيات.">
     <meta name="keywords" content="Ground EEG Paste, رسم مخ, تخطيط الدماغ, EEG, موجات المخ">
 
-    <!-- Google Fonts for Eye-Friendly Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS for Modern Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -32,7 +28,6 @@
         }
     </script>
     <style>
-        /* أنميشن بروز الأزرار بشكل عصري عند مرور الماوس */
         .btn-elevate {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -40,7 +35,6 @@
             transform: translateY(-5px);
             box-shadow: 0 15px 25px -8px rgba(6, 182, 212, 0.6);
         }
-        /* أنميشن نبضات رسم المخ داخل حرف O الكبير */
         @keyframes eeg-pulse {
             0%, 100% { transform: scaleY(1); opacity: 0.5; }
             50% { transform: scaleY(1.9); opacity: 1; }
@@ -51,14 +45,11 @@
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 min-h-screen font-sans transition-colors duration-300">
 
-    <!-- 2️⃣ واجهة الموقع الرئيسية (تفتح وتعمل فوراً الآن) -->
     <div id="mainWebsite" class="transition-all duration-700">
         
-        <!-- Header / Navbar -->
         <header class="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800">
             <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                 
-                <!-- Logo: Ground EEG Paste with large O and wave animation -->
                 <div class="flex items-center gap-1 font-bold text-2xl tracking-wide font-['Poppins']">
                     <span class="text-slate-900 dark:text-white">Gr</span>
                     <div class="relative w-9 h-9 border-4 border-cyan-500 dark:border-cyan-400 rounded-full flex items-center justify-center overflow-hidden mx-[-2px]">
@@ -72,7 +63,6 @@
                     <span class="text-slate-900 dark:text-white">und EEG Paste</span>
                 </div>
 
-                <!-- Theme Toggle Switch & Settings Gear -->
                 <div class="flex items-center gap-4">
                     <label class="relative inline-flex items-center cursor-pointer select-none">
                         <input type="checkbox" id="themeToggle" checked class="sr-only peer">
@@ -104,10 +94,8 @@
             </div>
         </header>
 
-        <!-- Main Body Grid Layout -->
         <main class="max-w-6xl mx-auto px-4 py-16 space-y-20">
 
-            <!-- Hero Headline -->
             <section class="text-center space-y-6">
                 <h1 class="text-4xl md:text-5xl font-bold leading-tight">مستقبل إدارة وتخطيط موجات <span class="text-cyan-500">Ground EEG Paste</span></h1>
                 <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-sm md:text-base">المنصة الأسرع والأكثر دقة المخصصة لأطباء وجراحي المخ والأعصاب لتحليل إشارات الدماغ وحفظ السجلات السريرية فورياً.</p>
@@ -116,7 +104,6 @@
                 </div>
             </section>
 
-            <!-- Testimonials Section -->
             <section class="space-y-8">
                 <div class="text-center">
                     <h2 class="text-2xl font-bold">آراء وتقييمات دكاترة رسم المخ والأعصاب ⭐</h2>
@@ -157,7 +144,6 @@
                 </div>
             </section>
 
-            <!-- Interactive CRUD Comment Box Section -->
             <section class="max-w-3xl mx-auto space-y-6">
                 <div class="border-b border-slate-200 dark:border-slate-800 pb-2">
                     <h2 class="text-xl font-bold">ملتقى مناقشات الأطباء والأعضاء 💬</h2>
@@ -172,9 +158,7 @@
                     </div>
                 </div>
 
-                <div id="commentsContainer" class="space-y-4">
-                    <!-- Live JavaScript CRUD Comments Will Show Here -->
-                </div>
+                <div id="commentsContainer" class="space-y-4"></div>
             </section>
 
         </main>
@@ -188,7 +172,6 @@
 
     </div>
 
-    <!-- Core Frontend Logic JavaScript Script -->
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const htmlElement = document.documentElement;
