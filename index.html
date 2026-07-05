@@ -1,634 +1,298 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl" class="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ground EEG — Precision Brainwave Monitoring</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Ground EEG Paste - منصة تحليل رسم المخ المتكاملة</title>
+    <meta name="description" content="موقع Ground EEG Paste هو المنصة الطبية العصرية الأحدث لتخطيط ومتابعة موجات رسم المخ وتحليل البيانات الحيوية بدقة فائقة للأطباء والمستشفيات.">
+    <meta name="keywords" content="Ground EEG Paste, رسم مخ, تخطيط الدماغ, EEG, موجات المخ">
 
-<!-- Fonts: Poppins for display (logo/headlines), Inter for body copy -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Tailwind CSS (CDN build) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        fontFamily: {
-          display: ['Poppins', 'sans-serif'],
-          body: ['Inter', 'sans-serif'],
-        },
-      }
-    }
-  }
-</script>
-
-<style>
-  /* ============================================================
-     THEME TOKENS
-     Light mode: clinical white / light gray with royal blue + teal
-     Dark mode:  deep charcoal / slate with neon cyber-cyan
-     ============================================================ */
-  :root{
-    --bg: #f5f7fa;
-    --bg-soft: #ffffff;
-    --surface: #ffffff;
-    --border: #e2e8f0;
-    --text: #1a2233;
-    --text-muted: #5b6b82;
-    --accent: #1d5fd6;      /* royal blue */
-    --accent-2: #0d9c8f;    /* teal */
-    --accent-soft: #e8effd;
-    --glow: rgba(29,95,214,0.25);
-  }
-  html.dark{
-    --bg: #0b0f14;
-    --bg-soft: #10161d;
-    --surface: #131b24;
-    --border: #223040;
-    --text: #e7f6f8;
-    --text-muted: #8ea3b5;
-    --accent: #21e6d6;      /* cyber cyan */
-    --accent-2: #21e6d6;
-    --accent-soft: rgba(33,230,214,0.08);
-    --glow: rgba(33,230,214,0.35);
-  }
-
-  *{ box-sizing:border-box; }
-  html{ scroll-behavior:smooth; }
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
-    transition:background .4s ease, color .4s ease;
-  }
-
-  /* ---------- Logo: animated EEG lines living inside the "O" ---------- */
-  .brand{
-    font-family:'Poppins', sans-serif;
-    font-weight:700;
-    font-size:1.65rem;
-    letter-spacing:-0.02em;
-    color:var(--text);
-    display:inline-flex;
-    align-items:baseline;
-  }
-  .brand .big-o{
-    position:relative;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:2.15rem;
-    height:2.15rem;
-    margin:0 1px;
-    border-radius:50%;
-    border:2.5px solid var(--accent);
-    overflow:hidden;
-    background:var(--accent-soft);
-    box-shadow:0 0 12px var(--glow);
-    vertical-align:middle;
-    transform:translateY(6px);
-  }
-  .brand .big-o svg{ width:100%; height:100%; }
-  .brand .eeg-line{
-    fill:none;
-    stroke:var(--accent);
-    stroke-width:2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-    stroke-dasharray:120;
-    stroke-dashoffset:120;
-    animation:eegDraw 2.4s linear infinite;
-  }
-  @keyframes eegDraw{
-    0%{ stroke-dashoffset:120; }
-    50%{ stroke-dashoffset:0; }
-    100%{ stroke-dashoffset:-120; }
-  }
-  .brand .eeg{ color:var(--accent); }
-
-  /* ---------- Buttons: elevate-on-hover micro interaction ---------- */
-  .btn-raise{
-    transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background .25s ease;
-    will-change:transform;
-  }
-  .btn-raise:hover{
-    transform:translateY(-4px);
-    box-shadow:0 14px 28px -8px var(--glow);
-  }
-  .btn-raise:active{
-    transform:translateY(-1px);
-  }
-
-  /* ---------- Toggle switch ---------- */
-  .toggle-track{
-    width:52px; height:28px; border-radius:999px;
-    background:var(--border);
-    position:relative; cursor:pointer;
-    transition:background .3s ease;
-    border:1px solid var(--border);
-  }
-  .toggle-thumb{
-    position:absolute; top:2px; left:2px;
-    width:22px; height:22px; border-radius:50%;
-    background:linear-gradient(135deg,var(--accent),var(--accent-2));
-    transition:transform .3s cubic-bezier(.2,.8,.2,1);
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-    display:flex; align-items:center; justify-content:center; font-size:12px;
-  }
-  html.dark .toggle-thumb{ transform:translateX(24px); }
-
-  /* ---------- Card / surface ---------- */
-  .surface{
-    background:var(--surface);
-    border:1px solid var(--border);
-  }
-
-  /* ---------- Settings dropdown ---------- */
-  .gear-btn{ transition:transform .5s ease, background .25s ease; }
-  .gear-btn:hover{ transform:rotate(75deg); }
-  #settingsMenu{
-    transform-origin: top right;
-    transition:opacity .18s ease, transform .18s ease;
-  }
-  #settingsMenu.hidden-menu{ opacity:0; transform:scale(.94) translateY(-6px); pointer-events:none; }
-
-  /* ---------- Hero waveform ambient animation ---------- */
-  .pulse-line{ animation:flow 3.6s linear infinite; }
-  @keyframes flow{
-    0%{ stroke-dashoffset:400; }
-    100%{ stroke-dashoffset:0; }
-  }
-
-  /* ---------- utility fade-up on scroll ---------- */
-  .reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
-  .reveal.in-view{ opacity:1; transform:translateY(0); }
-
-  ::selection{ background:var(--accent); color:#fff; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar{ width:10px; }
-  ::-webkit-scrollbar-track{ background:var(--bg); }
-  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:8px; }
-
-  textarea:focus, input:focus, button:focus-visible{
-    outline:2px solid var(--accent);
-    outline-offset:2px;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
-  }
-</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'Poppins', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* أنميشن بروز الأزرار بشكل عصري عند مرور الماوس */
+        .btn-elevate {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-elevate:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px -8px rgba(6, 182, 212, 0.6);
+        }
+        /* أنميشن نبضات رسم المخ داخل حرف O الكبير */
+        @keyframes eeg-pulse {
+            0%, 100% { transform: scaleY(1); opacity: 0.5; }
+            50% { transform: scaleY(1.9); opacity: 1; }
+        }
+        .eeg-wave { animation: eeg-pulse 1.4s infinite ease-in-out; }
+        .eeg-wave-delayed { animation: eeg-pulse 1.4s infinite ease-in-out 0.3s; }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 min-h-screen font-sans transition-colors duration-300">
 
-<body class="font-body">
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 dark:bg-slate-950 px-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6">
+            
+            <div class="flex items-center justify-center gap-1 font-bold text-3xl font-['Poppins']">
+                <span>Gr</span>
+                <div class="relative w-10 h-10 border-4 border-cyan-500 rounded-full flex items-center justify-center overflow-hidden mx-[-1px]">
+                    <div class="flex items-end gap-[2px] h-full pt-2">
+                        <div class="w-[3px] h-4 bg-cyan-500 rounded-full eeg-wave"></div>
+                        <div class="w-[3px] h-6 bg-cyan-500 rounded-full eeg-wave-delayed"></div>
+                        <div class="w-[3px] h-3 bg-cyan-500 rounded-full eeg-wave"></div>
+                    </div>
+                </div>
+                <span>und EEG Paste</span>
+            </div>
+            
+            <p class="text-sm text-slate-400">مرحباً بك في مجتمع أطباء رسم المخ والأعصاب، يرجى تسجيل الدخول للمتابعة</p>
 
-<!-- =========================================================
-     NAVIGATION
-========================================================= -->
-<header class="sticky top-0 z-50 backdrop-blur-md" style="background:color-mix(in srgb, var(--bg) 85%, transparent); border-bottom:1px solid var(--border);">
-  <div class="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between">
+            <div class="space-y-4 pt-2">
+                <button onclick="bypassLogin()" class="btn-elevate w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium py-3 px-4 rounded-2xl shadow-sm text-sm">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    تسجيل الدخول بواسطة Google
+                </button>
 
-    <!-- Brand / Logo -->
-    <a href="#top" class="brand" aria-label="Ground EEG home">
-      Gr
-      <span class="big-o" aria-hidden="true">
-        <svg viewBox="0 0 40 40">
-          <path class="eeg-line" d="M2 20 L10 20 L13 8 L17 32 L20 14 L23 26 L26 20 L38 20" />
-        </svg>
-      </span>
-      und <span class="eeg">EEG</span>
-    </a>
-
-    <!-- Desktop nav links -->
-    <nav class="hidden lg:flex items-center gap-8 text-sm font-medium" style="color:var(--text-muted)">
-      <a href="#features" class="hover:opacity-100 transition" style="color:var(--text)">Technology</a>
-      <a href="#testimonials" class="hover:opacity-100 transition" style="color:var(--text)">Clinician Reviews</a>
-      <a href="#comments" class="hover:opacity-100 transition" style="color:var(--text)">Community</a>
-      <a href="#footer" class="hover:opacity-100 transition" style="color:var(--text)">Contact</a>
-    </nav>
-
-    <div class="flex items-center gap-4">
-      <!-- Dark / Light toggle -->
-      <button id="themeToggle" class="toggle-track" aria-label="Toggle dark mode" title="Toggle theme">
-        <span class="toggle-thumb" id="themeThumb">🌙</span>
-      </button>
-
-      <!-- Settings gear -->
-      <div class="relative">
-        <button id="gearBtn" class="gear-btn w-10 h-10 rounded-full flex items-center justify-center surface" aria-haspopup="true" aria-expanded="false" aria-label="Open settings">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        </button>
-
-        <!-- Settings dropdown menu -->
-        <div id="settingsMenu" class="hidden-menu absolute right-0 mt-3 w-72 rounded-2xl surface shadow-2xl p-2 z-50" style="box-shadow:0 20px 40px -12px rgba(0,0,0,.35)">
-          <div class="px-4 py-3 border-b" style="border-color:var(--border)">
-            <p class="text-xs uppercase tracking-wide" style="color:var(--text-muted)">Support Line</p>
-            <a href="tel:01125866481" class="text-base font-semibold" style="color:var(--accent)">📞 01125866481</a>
-          </div>
-          <ul class="py-2 text-sm">
-            <li><button class="settings-item w-full text-left px-4 py-2.5 rounded-lg flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition">👤 <span>Account Settings</span></button></li>
-            <li><button class="settings-item w-full text-left px-4 py-2.5 rounded-lg flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition">🧠 <span>EEG Device Sync</span></button></li>
-            <li><button class="settings-item w-full text-left px-4 py-2.5 rounded-lg flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition">📤 <span>Data Export Options</span></button></li>
-            <li><button class="settings-item w-full text-left px-4 py-2.5 rounded-lg flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition">🔔 <span>Notification Preferences</span></button></li>
-          </ul>
+                <button onclick="bypassLogin()" class="btn-elevate w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium py-3 px-4 rounded-2xl shadow-sm text-sm">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    تسجيل الدخول بواسطة Facebook
+                </button>
+            </div>
+            <div class="text-[11px] text-slate-400">بدخولك للمنصة فأنت توافق على سياسات الخصوصية الطبية.</div>
         </div>
-      </div>
-
-      <button class="btn-raise hidden sm:inline-block px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style="background:var(--accent)">
-        Book a Demo
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- =========================================================
-     HERO
-========================================================= -->
-<section id="top" class="relative overflow-hidden">
-  <div class="max-w-7xl mx-auto px-5 sm:px-8 pt-20 pb-24 grid lg:grid-cols-2 gap-14 items-center">
-    <div class="reveal">
-      <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide mb-6" style="background:var(--accent-soft); color:var(--accent)">
-        FDA-ALIGNED SIGNAL ACCURACY · 99.4%
-      </span>
-      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-        Read the brain's<br/>
-        <span style="color:var(--accent)">true signal.</span>
-      </h1>
-      <p class="text-lg max-w-md mb-8" style="color:var(--text-muted)">
-        Ground EEG turns raw cortical activity into clear, actionable waveforms —
-        built for neurologists who can't afford noise.
-      </p>
-      <div class="flex flex-wrap gap-4">
-        <button class="btn-raise px-7 py-3.5 rounded-xl font-semibold text-white" style="background:var(--accent)">Start Free Trial</button>
-        <button class="btn-raise px-7 py-3.5 rounded-xl font-semibold surface" style="color:var(--text)">Watch Live Recording</button>
-      </div>
     </div>
 
-    <!-- Ambient animated waveform card -->
-    <div class="reveal surface rounded-3xl p-8 shadow-xl" style="box-shadow:0 30px 60px -20px var(--glow)">
-      <div class="flex items-center justify-between mb-6">
-        <p class="text-sm font-semibold" style="color:var(--text-muted)">LIVE CHANNEL — O1</p>
-        <span class="flex items-center gap-2 text-xs font-semibold" style="color:var(--accent)">
-          <span class="w-2 h-2 rounded-full" style="background:var(--accent); box-shadow:0 0 8px var(--glow)"></span> RECORDING
-        </span>
-      </div>
-      <svg viewBox="0 0 400 140" class="w-full h-36">
-        <path class="pulse-line" d="M0 70 L30 70 L38 20 L46 120 L54 40 L62 100 L70 70 L100 70 L108 30 L116 110 L124 50 L132 90 L140 70 L400 70"
-          fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="400" />
-      </svg>
-      <div class="grid grid-cols-3 gap-4 mt-6 text-center">
-        <div>
-          <p class="text-2xl font-bold font-display">12ms</p>
-          <p class="text-xs" style="color:var(--text-muted)">Latency</p>
-        </div>
-        <div>
-          <p class="text-2xl font-bold font-display">32ch</p>
-          <p class="text-xs" style="color:var(--text-muted)">Channels</p>
-        </div>
-        <div>
-          <p class="text-2xl font-bold font-display">99.4%</p>
-          <p class="text-xs" style="color:var(--text-muted)">Accuracy</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <div id="mainWebsite" class="blur-sm pointer-events-none select-none transition-all duration-700">
+        
+        <header class="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                
+                <div class="flex items-center gap-1 font-bold text-2xl tracking-wide font-['Poppins']">
+                    <span class="text-slate-900 dark:text-white">Gr</span>
+                    <div class="relative w-9 h-9 border-4 border-cyan-500 dark:border-cyan-400 rounded-full flex items-center justify-center overflow-hidden mx-[-2px]">
+                        <div class="flex items-end justify-center gap-[2px] w-full h-full pt-2">
+                            <div class="w-[3px] h-3 bg-cyan-500 dark:bg-cyan-400 rounded-full eeg-wave"></div>
+                            <div class="w-[3px] h-5 bg-cyan-500 dark:bg-cyan-400 rounded-full eeg-wave-delayed"></div>
+                            <div class="w-[3px] h-4 bg-cyan-500 dark:bg-cyan-400 rounded-full eeg-wave"></div>
+                            <div class="w-[3px] h-2 bg-cyan-500 dark:bg-cyan-400 rounded-full eeg-wave-delayed"></div>
+                        </div>
+                    </div>
+                    <span class="text-slate-900 dark:text-white">und EEG Paste</span>
+                </div>
 
-<!-- =========================================================
-     FEATURES
-========================================================= -->
-<section id="features" class="py-20" style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border)">
-  <div class="max-w-7xl mx-auto px-5 sm:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-14 reveal">
-      <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4">Built for the clinical edge</h2>
-      <p style="color:var(--text-muted)">Every module of Ground EEG is designed alongside practicing neurologists — not just engineers.</p>
-    </div>
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="reveal surface rounded-2xl p-8">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:var(--accent-soft)">🧠</div>
-        <h3 class="font-display font-semibold text-lg mb-2">Artifact Rejection AI</h3>
-        <p class="text-sm" style="color:var(--text-muted)">Automatically filters muscle and eye-movement noise in real time, isolating clean cortical signal.</p>
-      </div>
-      <div class="reveal surface rounded-2xl p-8">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:var(--accent-soft)">⚡</div>
-        <h3 class="font-display font-semibold text-lg mb-2">Sub-15ms Latency</h3>
-        <p class="text-sm" style="color:var(--text-muted)">Wireless capture pipeline built for seizure-onset detection with near-zero lag.</p>
-      </div>
-      <div class="reveal surface rounded-2xl p-8">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:var(--accent-soft)">🔒</div>
-        <h3 class="font-display font-semibold text-lg mb-2">HIPAA-Grade Security</h3>
-        <p class="text-sm" style="color:var(--text-muted)">End-to-end encrypted patient data, exportable in standard EDF/BDF formats.</p>
-      </div>
-    </div>
-  </div>
-</section>
+                <div class="flex items-center gap-4">
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" id="themeToggle" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:bg-slate-700 peer-checked:bg-cyan-500"></div>
+                        <span class="mr-2 text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">الوضع الداكن</span>
+                    </label>
 
-<!-- =========================================================
-     TESTIMONIALS
-========================================================= -->
-<section id="testimonials" class="py-20">
-  <div class="max-w-7xl mx-auto px-5 sm:px-8">
-    <div class="text-center max-w-2xl mx-auto mb-14 reveal">
-      <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4">Trusted by leading neurologists</h2>
-      <p style="color:var(--text-muted)">Real feedback from clinicians using Ground EEG in daily practice.</p>
-    </div>
+                    <div class="relative">
+                        <button id="gearBtn" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-[spin_10s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <div id="settingsDropdown" class="hidden absolute left-0 mt-2 w-64 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-4 text-sm">
+                            <p class="font-bold border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 text-cyan-500">⚙️ الإعدادات والدعم</p>
+                            <div class="space-y-2">
+                                <div class="p-2 bg-slate-50 dark:bg-slate-950 rounded-xl">
+                                    <p class="text-[11px] text-slate-400">رقم الدعم وخدمة العملاء:</p>
+                                    <p class="font-bold text-slate-800 dark:text-slate-200 tracking-wider">01125866481</p>
+                                </div>
+                                <a href="#" class="block p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">🔄 مزامنة أجهزة رسم المخ والـ EEG</a>
+                                <a href="#" class="block p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">📊 خيارات تصدير التقارير الطبية</a>
+                                <a href="#" class="block p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">👤 إعدادات الملف الشخصي للطبيب</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    <div class="grid md:grid-cols-3 gap-8">
+        <main class="max-w-6xl mx-auto px-4 py-16 space-y-20">
 
-      <div class="reveal surface rounded-2xl p-8 flex flex-col">
-        <div class="flex text-amber-400 mb-4">★★★★★</div>
-        <p class="text-sm mb-6" style="color:var(--text-muted)">
-          "The signal clarity is unlike anything I've used in 15 years of clinical EEG. Artifact rejection alone has cut my review time in half."
-        </p>
-        <div class="flex items-center gap-3 mt-auto">
-          <img src="https://i.pravatar.cc/100?img=12" alt="Portrait of Dr. Adam Ramsey" class="w-12 h-12 rounded-full object-cover" style="border:2px solid var(--accent)"/>
-          <div>
-            <p class="font-semibold text-sm">Dr. Adam Ramsey</p>
-            <p class="text-xs" style="color:var(--text-muted)">Neurologist, Mercy General Hospital</p>
-          </div>
-        </div>
-      </div>
+            <section class="text-center space-y-6">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight">مستقبل إدارة وتخطيط موجات <span class="text-cyan-500">Ground EEG Paste</span></h1>
+                <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-sm md:text-base">المنصة الأسرع والأكثر دقة المخصصة لأطباء وجراحي المخ والأعصاب لتحليل إشارات الدماغ وحفظ السجلات السريرية فورياً.</p>
+                <div>
+                    <button class="btn-elevate bg-cyan-500 text-white font-bold px-8 py-3 rounded-2xl shadow-lg shadow-cyan-500/20 text-sm">دخول لوحة التحكم الذكية</button>
+                </div>
+            </section>
 
-      <div class="reveal surface rounded-2xl p-8 flex flex-col">
-        <div class="flex text-amber-400 mb-4">★★★★★</div>
-        <p class="text-sm mb-6" style="color:var(--text-muted)">
-          "Ground EEG's seizure-onset detection flagged an event my resident missed. The latency is genuinely sub-clinical grade."
-        </p>
-        <div class="flex items-center gap-3 mt-auto">
-          <img src="https://i.pravatar.cc/100?img=47" alt="Portrait of Dr. Sarah Jenkins" class="w-12 h-12 rounded-full object-cover" style="border:2px solid var(--accent)"/>
-          <div>
-            <p class="font-semibold text-sm">Dr. Sarah Jenkins</p>
-            <p class="text-xs" style="color:var(--text-muted)">Epileptologist, Northshore Neuro Clinic</p>
-          </div>
-        </div>
-      </div>
+            <section class="space-y-8">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold">آراء وتقييمات دكاترة رسم المخ والأعصاب ⭐</h2>
+                    <p class="text-xs text-slate-400 mt-1">تجارب من عيادات ومراكز طبية عالمية تعتمد على نظامنا بالكامل.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80" alt="Doctor" class="w-11 h-11 rounded-full object-cover border-2 border-cyan-500">
+                            <div>
+                                <h3 class="font-bold text-xs">أ.د. عادل الرمزي</h3>
+                                <p class="text-[10px] text-slate-400">استشاري تخطيط الدماغ والأعصاب</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">"المنصة ممتازة جداً في تصفية الإشارات والتشويش المصاحب لرسم المخ، الـ Dark mode مريح جداً خلال التحليل الطويل للتقارير."</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1594824813573-246434e33963?w=150&auto=format&fit=crop&q=80" alt="Doctor" class="w-11 h-11 rounded-full object-cover border-2 border-cyan-500">
+                            <div>
+                                <h3 class="font-bold text-xs">د. سارة جاكوب</h3>
+                                <p class="text-[10px] text-slate-400">مديرة مركز نيروكير للأعصاب إكلينيكياً</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">"سهولة الاتصال ووجود زر الترس السريع لمعرفة رقم دعم خدمة العملاء فكرة عبقرية وتسهل عملنا الطبي اليومي بدون تعقيد."</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80" alt="Doctor" class="w-11 h-11 rounded-full object-cover border-2 border-cyan-500">
+                            <div>
+                                <h3 class="font-bold text-xs">د. خالد مأمون</h3>
+                                <p class="text-[10px] text-slate-400">أخصائي فيزيولوجيا الأعصاب بمستشفى قصر العيني</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">"الأنميشنز وتأثير بروز الأزرار جذاب للغاية ومريح للعين، والمنصة تعكس تماماً التطور العصري في الأجهزة الطبية الرقمية."</p>
+                    </div>
+                </div>
+            </section>
 
-      <div class="reveal surface rounded-2xl p-8 flex flex-col">
-        <div class="flex text-amber-400 mb-4">★★★★★</div>
-        <p class="text-sm mb-6" style="color:var(--text-muted)">
-          "Exporting to EDF for research took one click. The whole platform feels like it was designed by someone who's actually read a hypnogram."
-        </p>
-        <div class="flex items-center gap-3 mt-auto">
-          <img src="https://i.pravatar.cc/100?img=33" alt="Portrait of Dr. Michael Osei" class="w-12 h-12 rounded-full object-cover" style="border:2px solid var(--accent)"/>
-          <div>
-            <p class="font-semibold text-sm">Dr. Michael Osei</p>
-            <p class="text-xs" style="color:var(--text-muted)">Clinical Neurophysiologist, Cedar Valley Health</p>
-          </div>
-        </div>
-      </div>
+            <section class="max-w-3xl mx-auto space-y-6">
+                <div class="border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <h2 class="text-xl font-bold">ملتقى مناقشات الأطباء والأعضاء 💬</h2>
+                    <p class="text-xs text-slate-400">شارك استفسارك أو تعليقك الطبي حول تحديثات منصة الـ EEG Paste.</p>
+                </div>
 
-    </div>
-  </div>
-</section>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl space-y-3 shadow-sm">
+                    <textarea id="commentInput" rows="3" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all text-slate-900 dark:text-white" placeholder="اكتب تعليقك الطبي أو استفسارك هنا..."></textarea>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400">الرجاء الحفاظ على المصطلحات العلمية الطبية.</span>
+                        <button id="submitCommentBtn" class="btn-elevate bg-cyan-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-cyan-500/10">نشر التعليق</button>
+                    </div>
+                </div>
 
-<!-- =========================================================
-     COMMENT SYSTEM (CRUD)
-========================================================= -->
-<section id="comments" class="py-20" style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border)">
-  <div class="max-w-3xl mx-auto px-5 sm:px-8">
-    <div class="text-center mb-10 reveal">
-      <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4">Community discussion</h2>
-      <p style="color:var(--text-muted)">Share feedback, questions, or your own EEG experience.</p>
-    </div>
+                <div id="commentsContainer" class="space-y-4">
+                    </div>
+            </section>
 
-    <!-- New comment composer -->
-    <div class="reveal surface rounded-2xl p-5 mb-8">
-      <textarea id="commentInput" rows="3" placeholder="Write a comment..."
-        class="w-full bg-transparent resize-none text-sm outline-none placeholder:opacity-60"
-        style="color:var(--text)"></textarea>
-      <div class="flex justify-between items-center mt-3 pt-3 border-t" style="border-color:var(--border)">
-        <span class="text-xs" style="color:var(--text-muted)">Be respectful — comments are public.</span>
-        <button id="postCommentBtn" class="btn-raise px-6 py-2.5 rounded-xl text-sm font-semibold text-white" style="background:var(--accent)">Post Comment</button>
-      </div>
+        </main>
+
+        <footer class="border-t border-slate-200 dark:border-slate-800 mt-20 bg-white dark:bg-slate-950 py-8 text-center text-xs space-y-2 text-slate-400 transition-colors duration-300">
+            <p class="font-medium text-slate-500 dark:text-slate-400">جميع حقوق الطبع و النشر محفوظة &copy; 2026 Ground EEG Paste</p>
+            <div>
+                <a href="#" class="text-cyan-500 dark:text-cyan-400 hover:underline inline-block px-2 font-medium">سياسه الخصوصية للمستخدم</a>
+            </div>
+        </footer>
+
     </div>
 
-    <!-- Comment list -->
-    <div id="commentList" class="space-y-4"></div>
-  </div>
-</section>
+    <script>
+        // 1. Function to bypass login layout and reveal the website
+        function bypassLogin() {
+            const loginScreen = document.getElementById('loginScreen');
+            const mainWebsite = document.getElementById('mainWebsite');
+            
+            loginScreen.classList.add('opacity-0', 'pointer-events-none', 'transition-all', 'duration-500');
+            setTimeout(() => loginScreen.remove(), 500);
+            
+            mainWebsite.classList.remove('blur-sm', 'pointer-events-none', 'select-none');
+        }
 
-<!-- =========================================================
-     CTA
-========================================================= -->
-<section class="py-20 text-center reveal">
-  <div class="max-w-2xl mx-auto px-5">
-    <h2 class="font-display text-3xl sm:text-4xl font-bold mb-4">Ready to see the signal clearly?</h2>
-    <p class="mb-8" style="color:var(--text-muted)">Join clinics already running Ground EEG in production.</p>
-    <button class="btn-raise px-8 py-4 rounded-xl font-semibold text-white text-lg" style="background:var(--accent)">Request Access</button>
-  </div>
-</section>
+        // 2. Light / Dark Mode dynamic switch functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
 
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-<footer id="footer" class="py-10" style="border-top:1px solid var(--border)">
-  <div class="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-    <a href="#top" class="brand" style="font-size:1.2rem">
-      Gr<span class="big-o" style="width:1.5rem;height:1.5rem;transform:translateY(4px)"><svg viewBox="0 0 40 40"><path class="eeg-line" d="M2 20 L10 20 L13 8 L17 32 L20 14 L23 26 L26 20 L38 20" /></svg></span>und <span class="eeg">EEG</span>
-    </a>
-    <div class="text-center sm:text-right" dir="rtl">
-      <p class="text-sm" style="color:var(--text-muted)">جميع حقوق الطبع و النشر محفوظة © 2026</p>
-      <a href="#privacy" id="privacyLink" class="text-sm font-semibold hover:underline" style="color:var(--accent)">سياسة الخصوصية</a>
-    </div>
-  </div>
-</footer>
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                htmlElement.classList.add('dark');
+            } else {
+                htmlElement.classList.remove('dark');
+            }
+        });
 
-<!-- Mock privacy policy modal -->
-<div id="privacyModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-5" style="background:rgba(0,0,0,.55)">
-  <div class="surface rounded-2xl max-w-lg w-full p-8 relative" dir="rtl">
-    <button id="closePrivacy" class="absolute top-4 left-4 text-xl" aria-label="Close">✕</button>
-    <h3 class="font-display text-2xl font-bold mb-4">سياسة الخصوصية</h3>
-    <p class="text-sm leading-7" style="color:var(--text-muted)">
-      نلتزم في Ground EEG بحماية بيانات المرضى والمستخدمين وفق أعلى معايير التشفير والخصوصية الطبية.
-      لا تتم مشاركة أي بيانات مع أطراف ثالثة دون إذن صريح، ويمكن للمستخدم طلب حذف بياناته في أي وقت.
-    </p>
-  </div>
-</div>
+        // 3. Settings dropdown gear menu switch toggle
+        const gearBtn = document.getElementById('gearBtn');
+        const settingsDropdown = document.getElementById('settingsDropdown');
 
-<!-- =========================================================
-     JAVASCRIPT
-========================================================= -->
-<script>
-  /* ---------------------------------------------------------
-     1. THEME TOGGLE (Dark / Light) — persists via in-memory state
-  --------------------------------------------------------- */
-  const root = document.documentElement;
-  const themeToggle = document.getElementById('themeToggle');
-  const themeThumb = document.getElementById('themeThumb');
+        gearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => settingsDropdown.classList.add('hidden'));
 
-  function setTheme(isDark){
-    root.classList.toggle('dark', isDark);
-    themeThumb.textContent = isDark ? '⚡' : '🌙';
-  }
-  // Default to system preference on load
-  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        // 4. Advanced CRUD Dynamic Comment System Logic
+        const commentInput = document.getElementById('commentInput');
+        const submitCommentBtn = document.getElementById('submitCommentBtn');
+        const commentsContainer = document.getElementById('commentsContainer');
 
-  themeToggle.addEventListener('click', () => {
-    setTheme(!root.classList.contains('dark'));
-  });
+        let commentsData = [
+            { id: 101, author: "د. أحمد الشافعي", text: "هل تدعم المنصة سحب ملفات الـ EDF+ الناتجة عن أجهزة رسم المخ الحديثة؟" }
+        ];
 
-  /* ---------------------------------------------------------
-     2. SETTINGS GEAR DROPDOWN
-  --------------------------------------------------------- */
-  const gearBtn = document.getElementById('gearBtn');
-  const settingsMenu = document.getElementById('settingsMenu');
+        function renderComments() {
+            commentsContainer.innerHTML = '';
+            if (commentsData.length === 0) {
+                commentsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">لا توجد تعليقات حالياً. كن أول طبيب يشارك استفساره!</p>`;
+                return;
+            }
 
-  function toggleMenu(open){
-    settingsMenu.classList.toggle('hidden-menu', !open);
-    gearBtn.setAttribute('aria-expanded', String(open));
-  }
-  gearBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleMenu(settingsMenu.classList.contains('hidden-menu'));
-  });
-  document.addEventListener('click', (e) => {
-    if (!settingsMenu.contains(e.target) && e.target !== gearBtn){
-      toggleMenu(false);
-    }
-  });
-  // Mock action feedback for each settings item
-  document.querySelectorAll('.settings-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const label = btn.querySelector('span').textContent;
-      alert(`${label} — this would open the ${label} panel.`);
-      toggleMenu(false);
-    });
-  });
+            commentsData.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex gap-3 shadow-sm";
+                row.innerHTML = `
+                    <div class="w-9 h-9 rounded-full bg-cyan-100 dark:bg-cyan-950/40 flex items-center justify-center text-cyan-500 text-xs shrink-0 select-none">👨‍⚕️</div>
+                    <div class="flex-1 space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300">${item.author}</h4>
+                            <div class="flex gap-2 text-[11px] font-medium">
+                                <button onclick="updateComment(${item.id})" class="text-blue-500 hover:underline">تعديل</button>
+                                <button onclick="deleteComment(${item.id})" class="text-red-500 hover:underline">حذف</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${item.text}</p>
+                    </div>
+                `;
+                commentsContainer.appendChild(row);
+            });
+        }
 
-  /* ---------------------------------------------------------
-     3. PRIVACY POLICY MODAL
-  --------------------------------------------------------- */
-  const privacyModal = document.getElementById('privacyModal');
-  document.getElementById('privacyLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    privacyModal.classList.remove('hidden');
-    privacyModal.classList.add('flex');
-  });
-  document.getElementById('closePrivacy').addEventListener('click', () => {
-    privacyModal.classList.add('hidden');
-    privacyModal.classList.remove('flex');
-  });
-  privacyModal.addEventListener('click', (e) => {
-    if (e.target === privacyModal){
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    }
-  });
+        // Add Comment (Create)
+        submitCommentBtn.addEventListener('click', () => {
+            const val = commentInput.value.trim();
+            if(!val) return alert("من فضلك اكتب تعليقك الطبي أولاً!");
 
-  /* ---------------------------------------------------------
-     4. COMMENT SYSTEM — full CRUD (Create, Read, Update, Delete)
-     Comments are stored in a simple in-memory array and re-rendered
-     on every change. New comments are unshifted to the top.
-  --------------------------------------------------------- */
-  let comments = [
-    { id: 1, text: "This platform completely changed how our sleep lab reviews overnight recordings. Huge time saver.", time: "2 days ago" },
-    { id: 2, text: "Would love to see BIDS-format export added in a future release!", time: "5 days ago" },
-  ];
-  let nextId = 3;
-
-  const commentList = document.getElementById('commentList');
-  const commentInput = document.getElementById('commentInput');
-  const postCommentBtn = document.getElementById('postCommentBtn');
-
-  function renderComments(){
-    commentList.innerHTML = '';
-    comments.forEach(c => {
-      const card = document.createElement('div');
-      card.className = 'surface rounded-2xl p-5 reveal in-view';
-      card.dataset.id = c.id;
-
-      card.innerHTML = `
-        <p class="comment-text text-sm mb-3" style="color:var(--text)">${escapeHtml(c.text)}</p>
-        <textarea class="comment-edit-input hidden w-full bg-transparent text-sm outline-none border rounded-lg p-2 mb-3" style="color:var(--text); border-color:var(--border)" rows="2">${escapeHtml(c.text)}</textarea>
-        <div class="flex items-center justify-between">
-          <span class="text-xs" style="color:var(--text-muted)">Posted ${c.time}</span>
-          <div class="flex gap-2">
-            <button class="edit-btn btn-raise text-xs font-semibold px-4 py-1.5 rounded-lg surface" style="color:var(--accent)">Edit</button>
-            <button class="save-btn btn-raise hidden text-xs font-semibold px-4 py-1.5 rounded-lg text-white" style="background:var(--accent)">Save</button>
-            <button class="delete-btn btn-raise text-xs font-semibold px-4 py-1.5 rounded-lg text-white" style="background:#e0435c">Delete</button>
-          </div>
-        </div>
-      `;
-      commentList.appendChild(card);
-    });
-  }
-
-  function escapeHtml(str){
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // CREATE
-  postCommentBtn.addEventListener('click', () => {
-    const text = commentInput.value.trim();
-    if (!text) return;
-    comments.unshift({ id: nextId++, text, time: 'just now' });
-    commentInput.value = '';
-    renderComments();
-  });
-
-  // READ / UPDATE / DELETE — delegated click handling
-  commentList.addEventListener('click', (e) => {
-    const card = e.target.closest('[data-id]');
-    if (!card) return;
-    const id = Number(card.dataset.id);
-    const textEl = card.querySelector('.comment-text');
-    const editInput = card.querySelector('.comment-edit-input');
-    const editBtn = card.querySelector('.edit-btn');
-    const saveBtn = card.querySelector('.save-btn');
-
-    if (e.target.classList.contains('delete-btn')){
-      comments = comments.filter(c => c.id !== id);
-      renderComments();
-      return;
-    }
-
-    if (e.target.classList.contains('edit-btn')){
-      // switch to edit mode
-      textEl.classList.add('hidden');
-      editInput.classList.remove('hidden');
-      editBtn.classList.add('hidden');
-      saveBtn.classList.remove('hidden');
-      editInput.focus();
-      return;
-    }
-
-    if (e.target.classList.contains('save-btn')){
-      const newText = editInput.value.trim();
-      if (newText){
-        const comment = comments.find(c => c.id === id);
-        comment.text = newText;
-        comment.time = 'edited just now';
-      }
-      renderComments();
-      return;
-    }
-  });
-
-  renderComments();
-
-  /* ---------------------------------------------------------
-     5. SCROLL REVEAL ANIMATIONS
-  --------------------------------------------------------- */
-  const revealEls = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  revealEls.forEach(el => io.observe(el));
-</script>
-
-</body>
-</html>
+            const newItem = {
+                id: Date.now(),
+                author: "طبيب زائر (أنت)",
+                text: val
+            };
+            commentsData.unshift(newItem);
+            commentInput.value = '';
+            renderComments();
+        });
