@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <meta name="google-site-verification" content="9f9ffb6124463979" />
+
     <title>Ground EEG Paste - منصة تحليل رسم المخ المتكاملة</title>
     <meta name="description" content="موقع Ground EEG Paste هو المنصة الطبية العصرية الأحدث لتخطيط ومتابعة موجات رسم المخ وتحليل البيانات الحيوية بدقة فائقة للأطباء والمستشفيات.">
     <meta name="keywords" content="Ground EEG Paste, رسم مخ, تخطيط الدماغ, EEG, موجات المخ">
@@ -213,46 +215,35 @@
     </div>
 
     <script>
-        // 1. Function to bypass login layout and reveal the website
         function bypassLogin() {
             const loginScreen = document.getElementById('loginScreen');
             const mainWebsite = document.getElementById('mainWebsite');
-            
             loginScreen.classList.add('opacity-0', 'pointer-events-none', 'transition-all', 'duration-500');
             setTimeout(() => loginScreen.remove(), 500);
-            
             mainWebsite.classList.remove('blur-sm', 'pointer-events-none', 'select-none');
         }
 
-        // 2. Light / Dark Mode dynamic switch functionality
         const themeToggle = document.getElementById('themeToggle');
         const htmlElement = document.documentElement;
-
         themeToggle.addEventListener('change', () => {
-            if (themeToggle.checked) {
-                htmlElement.classList.add('dark');
-            } else {
-                htmlElement.classList.remove('dark');
-            }
+            if (themeToggle.checked) { htmlElement.classList.add('dark'); } 
+            else { htmlElement.classList.remove('dark'); }
         });
 
-        // 3. Settings dropdown gear menu switch toggle
         const gearBtn = document.getElementById('gearBtn');
         const settingsDropdown = document.getElementById('settingsDropdown');
-
         gearBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             settingsDropdown.classList.toggle('hidden');
         });
         document.addEventListener('click', () => settingsDropdown.classList.add('hidden'));
 
-        // 4. Advanced CRUD Dynamic Comment System Logic
         const commentInput = document.getElementById('commentInput');
         const submitCommentBtn = document.getElementById('submitCommentBtn');
         const commentsContainer = document.getElementById('commentsContainer');
 
         let commentsData = [
-            { id: 101, author: "د. أحمد الشافعي", text: "هل تدعم المنصة سحب ملفات الـ EDF+ الناتجة عن أجهزة رسم المخ الحديثة؟" }
+            { id: 101, author: "د. أحمد الشافعي", text: "هل تدعم المنصة سحب ملفات الـ EDF+ الناتجة عن أجهزة رسم المخ الحديثة?" }
         ];
 
         function renderComments() {
@@ -261,7 +252,6 @@
                 commentsContainer.innerHTML = `<p class="text-center text-xs text-slate-400 py-4">لا توجد تعليقات حالياً. كن أول طبيب يشارك استفساره!</p>`;
                 return;
             }
-
             commentsData.forEach(item => {
                 const row = document.createElement('div');
                 row.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex gap-3 shadow-sm";
@@ -282,17 +272,21 @@
             });
         }
 
-        // Add Comment (Create)
         submitCommentBtn.addEventListener('click', () => {
             const val = commentInput.value.trim();
             if(!val) return alert("من فضلك اكتب تعليقك الطبي أولاً!");
-
-            const newItem = {
-                id: Date.now(),
-                author: "طبيب زائر (أنت)",
-                text: val
-            };
+            const newItem = { id: Date.now(), author: "طبيب زائر (أنت)", text: val };
             commentsData.unshift(newItem);
             commentInput.value = '';
             renderComments();
         });
+
+        window.deleteComment = function(id) {
+            if(confirm("هل أنت متأكد من رغبتك في حذف هذا التعليق؟")) {
+                commentsData = commentsData.filter(c => c.id !== id);
+                renderComments();
+            }
+        };
+
+        window.updateComment = function(id) {
+            const target = commentsData.fin
